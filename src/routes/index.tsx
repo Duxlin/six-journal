@@ -1,6 +1,7 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { ChevronRight } from "lucide-react";
 import { EquityChart } from "@/components/journal/equity-chart";
+import { MetricBoard } from "@/components/journal/metrics";
 import { Button } from "@/components/journal/bits";
 import { cycleSample, maxPlannedRisk, performance } from "@/lib/journal/engine";
 import {
@@ -8,8 +9,6 @@ import {
   directionLabel,
   formatMoney,
   formatPct,
-  formatPlainPct,
-  formatR,
   formatSignedMoney,
   pnlClass,
 } from "@/lib/journal/format";
@@ -115,16 +114,21 @@ function Desk() {
         ) : null}
       </section>
 
-      <section className="mt-3 grid grid-cols-2 gap-2">
-        <Metric label="Win rate" value={formatPlainPct(stats.winRate)} note={`${stats.closedCount} closed`} />
-        <Metric label="Expectancy" value={stats.expectancy == null ? "—" : formatR(stats.expectancy)} note="per close" />
-        <Metric
-          label="Rules"
-          value={formatPlainPct(stats.compliance)}
-          note={`${stats.complianceMet}/${stats.complianceAssessed}`}
+      <div className="mt-3">
+        <MetricBoard
+          winRate={stats.winRate}
+          wins={stats.wins}
+          losses={stats.losses}
+          flats={stats.flats}
+          expectancy={stats.expectancy}
+          compliance={stats.compliance}
+          complianceNote={`${stats.complianceMet} of ${stats.complianceAssessed} closed trades`}
+          execution={stats.execution}
+          executionNote={`${stats.executed} taken of ${stats.identified} qualifying setups`}
+          drawdownLabel={formatMoney(stats.maxDrawdown)}
+          drawdownFill={settings.startingBalance > 0 ? Math.min(1, stats.maxDrawdown / settings.startingBalance) : 0}
         />
-        <Metric label="Execution" value={formatPlainPct(stats.execution)} note={`${stats.executed}/${stats.identified}`} />
-      </section>
+      </div>
 
       {stats.curve.length > 1 ? (
         <div className="mt-3 rounded-2xl bg-surface px-2 py-3 ring-1 ring-line">
@@ -182,16 +186,6 @@ function Desk() {
         A record of process, not a forecast and not financial advice. Six trades cannot prove an edge. A planned 1:3 is
         not a promise the win pays exactly 3R after costs.
       </p>
-    </div>
-  );
-}
-
-function Metric({ label, value, note }: { label: string; value: string; note: string }) {
-  return (
-    <div className="rounded-2xl bg-surface px-3.5 py-3 ring-1 ring-line">
-      <p className="text-[11px] tracking-wide text-faint uppercase">{label}</p>
-      <p className="nums mt-1 text-lg">{value}</p>
-      <p className="nums mt-0.5 text-xs text-muted">{note}</p>
     </div>
   );
 }

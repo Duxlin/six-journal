@@ -1,8 +1,9 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Banner, Button, Field, PageTitle, TextArea } from "@/components/journal/bits";
+import { MetricBoard } from "@/components/journal/metrics";
 import { cycleSample } from "@/lib/journal/engine";
-import { formatMoney, formatPlainPct, formatR, formatSignedMoney, pnlClass } from "@/lib/journal/format";
+import { formatMoney, formatR, formatSignedMoney, pnlClass } from "@/lib/journal/format";
 import { useJournal } from "@/lib/journal/store";
 import { cn } from "@/lib/utils";
 
@@ -52,11 +53,21 @@ function CyclePage() {
           <p className="nums mt-3 text-sm">
             {sample.count} of {settings.cycleLength} qualifying closes
           </p>
-          <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
+          <div className="mt-4">
+            <MetricBoard
+              kicker="Qualifying"
+              winRate={sample.winRate}
+              wins={sample.wins}
+              losses={sample.losses}
+              flats={sample.flats}
+              expectancy={sample.expectancy}
+              compliance={sample.compliance}
+              complianceNote={`${sample.closed.length} closed in this cycle`}
+            />
+          </div>
+          <dl className="mt-3 grid grid-cols-2 gap-2 text-sm">
             <Stat label="Net on the six" value={formatSignedMoney(sample.netPnl)} className={pnlClass(sample.netPnl)} />
             <Stat label="Total R" value={formatR(sample.count ? sample.totalR : null)} />
-            <Stat label="Win rate" value={`${formatPlainPct(sample.winRate)} · ${sample.count}`} />
-            <Stat label="Expectancy" value={sample.expectancy == null ? "—" : formatR(sample.expectancy)} />
           </dl>
 
           <h2 className="mt-6 text-sm text-muted">Counting</h2>
