@@ -194,6 +194,7 @@ export interface AccountSettings {
   cycleLength: number;
   noTradeNotes: string;
   newsRuleMode: NewsRuleMode;
+  configured: boolean;
 }
 
 export const EMPTY_CHECKLIST: Checklist = {

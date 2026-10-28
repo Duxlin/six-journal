@@ -1,8 +1,9 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { ChevronRight } from "lucide-react";
+import { useState } from "react";
 import { EquityChart } from "@/components/journal/equity-chart";
 import { MetricBoard } from "@/components/journal/metrics";
-import { Button } from "@/components/journal/bits";
+import { Button, Field, TextInput } from "@/components/journal/bits";
 import { cycleSample, maxPlannedRisk, performance } from "@/lib/journal/engine";
 import {
   STATUS_LABEL,
@@ -20,6 +21,55 @@ export const Route = createFileRoute("/")({
 });
 
 function Desk() {
+  const settings = useJournal((state) => state.settings);
+  if (!settings.configured) return <AccountSetup />;
+  return <DeskBody />;
+}
+
+function AccountSetup() {
+  const updateSettings = useJournal((state) => state.updateSettings);
+  const [start, setStart] = useState("");
+  const [original, setOriginal] = useState("");
+  const [error, setError] = useState("");
+
+  return (
+    <div>
+      <p className="text-[11px] font-medium tracking-[0.22em] text-signal uppercase">Your account</p>
+      <h1 className="mt-2 font-display text-4xl tracking-tight">Type the balance you have.</h1>
+      <p className="mt-3 text-sm leading-relaxed text-muted">
+        Nothing is prefilled. The 1% cap is calculated from the starting balance you enter here, and it stays fixed for the six-trade test.
+      </p>
+      <form
+        className="mt-6 flex flex-col gap-4"
+        onSubmit={(event) => {
+          event.preventDefault();
+          const startN = Number(start);
+          const originalN = Number(original);
+          if (!(startN > 0) || !(originalN > 0)) {
+            setError("Both amounts have to be above zero.");
+            return;
+          }
+          updateSettings({
+            startingBalance: startN,
+            originalAccountSize: originalN,
+            configured: true,
+          });
+        }}
+      >
+        <Field label="Starting balance" hint="The cash you are journaling from today. Risk is 1% of this.">
+          <TextInput inputMode="decimal" value={start} onChange={(event) => setStart(event.target.value)} placeholder="24760.40" />
+        </Field>
+        <Field label="Original account size" hint="Shown beside the balance so a drawdown stays visible.">
+          <TextInput inputMode="decimal" value={original} onChange={(event) => setOriginal(event.target.value)} placeholder="25000" />
+        </Field>
+        {error ? <p className="text-sm text-clay">{error}</p> : null}
+        <Button type="submit">Save and open the desk</Button>
+      </form>
+    </div>
+  );
+}
+
+function DeskBody() {
   const settings = useJournal((state) => state.settings);
   const trades = useJournal((state) => state.trades);
   const missed = useJournal((state) => state.missed);

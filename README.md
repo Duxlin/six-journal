@@ -1,8 +1,10 @@
 # Six
 
-A 1:3 six-trade test journal. It records planned risk, fills, closes, and the cycle. It does not connect to a broker, and it does not forecast price.
+A 1:3 six-trade test journal with a chart. It records planned risk, fills, closes, and the cycle. It does not forecast price.
 
-Trades stay in the browser (`localStorage`). The journal starts at $24,760.40 on a $25,000 account, with a fixed 1% risk cap.
+Each sign-in lives in this browser. That person's trades, drawings, and alerts stay separate. The starting balance is blank until they type it. The 1% cap is fixed from that number.
+
+The chart uses public FX quotes (about every 30 seconds), with 1-minute through monthly bars. Daily and higher cover about 12 months. OANDA candles load only if you paste your own API token. Forex.com and FXCM do not offer a free candle feed, so those sources stay empty rather than showing invented prices.
 
 ## Run locally
 

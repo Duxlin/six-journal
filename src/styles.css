@@ -3,6 +3,7 @@
 @theme {
   --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Syne", ui-sans-serif, system-ui, sans-serif;
+  --font-gothic: "UnifrakturMaguntia", "Old English Text MT", serif;
   --color-bg: #07090e;
   --color-surface: #121722;
   --color-raised: #1b2333;

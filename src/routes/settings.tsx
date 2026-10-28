@@ -2,8 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Banner, Button, Field, PageTitle, TextArea, TextInput } from "@/components/journal/bits";
 import { maxPlannedRisk } from "@/lib/journal/engine";
+import { signOut } from "@/lib/accounts";
 import { formatMoney } from "@/lib/journal/format";
-import { backupPayload, parseBackup, useJournal } from "@/lib/journal/store";
+import { backupPayload, initialData, parseBackup, useJournal } from "@/lib/journal/store";
 import type { NewsRuleMode, Trade } from "@/lib/journal/types";
 
 export const Route = createFileRoute("/settings")({
@@ -86,8 +87,8 @@ function SettingsPage() {
   const replaceAll = useJournal((state) => state.replaceAll);
   const resetJournal = useJournal((state) => state.resetJournal);
 
-  const [start, setStart] = useState(String(settings.startingBalance));
-  const [original, setOriginal] = useState(String(settings.originalAccountSize));
+  const [start, setStart] = useState(settings.startingBalance > 0 ? String(settings.startingBalance) : "");
+  const [original, setOriginal] = useState(settings.originalAccountSize > 0 ? String(settings.originalAccountSize) : "");
   const [notes, setNotes] = useState(settings.noTradeNotes);
   const [news, setNews] = useState<NewsRuleMode>(settings.newsRuleMode);
   const [message, setMessage] = useState("");
@@ -109,6 +110,7 @@ function SettingsPage() {
       originalAccountSize: originalN,
       noTradeNotes: notes,
       newsRuleMode: news,
+      configured: true,
     });
     setTone("moss");
     setMessage("Saved. Past trades keep the risk cap they were planned with. The balance shown is this start plus closed results.");
@@ -155,6 +157,15 @@ function SettingsPage() {
           </div>
         </div>
         <Button onClick={saveAccount}>Save account</Button>
+        <Button
+          variant="ghost"
+          onClick={() => {
+            signOut();
+            useJournal.setState({ ...initialData(), hydrated: true });
+          }}
+        >
+          Sign out
+        </Button>
         {message ? <Banner tone={tone}>{message}</Banner> : null}
       </div>
 

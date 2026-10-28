@@ -13,6 +13,7 @@ import {
   validateSetup,
   type SetupInput,
 } from "./engine.ts";
+import { readSessionId } from "../accounts";
 import { localDate } from "./format.ts";
 import { presetById } from "./presets.ts";
 import {
@@ -27,25 +28,35 @@ import {
   type Trade,
 } from "./types.ts";
 
-const safeStorage: Pick<Storage, "getItem" | "setItem" | "removeItem"> =
-  typeof window === "undefined"
-    ? {
-        getItem: () => null,
-        setItem: () => {},
-        removeItem: () => {},
-      }
-    : localStorage;
+const safeStorage: Pick<Storage, "getItem" | "setItem" | "removeItem"> = {
+  getItem: (key) => {
+    const id = readSessionId();
+    if (!id || typeof window === "undefined") return null;
+    return localStorage.getItem(`six-journal:${id}:${key}`);
+  },
+  setItem: (key, value) => {
+    const id = readSessionId();
+    if (!id || typeof window === "undefined") return;
+    localStorage.setItem(`six-journal:${id}:${key}`, value);
+  },
+  removeItem: (key) => {
+    const id = readSessionId();
+    if (!id || typeof window === "undefined") return;
+    localStorage.removeItem(`six-journal:${id}:${key}`);
+  },
+};
 
 export const DEFAULT_SETTINGS: AccountSettings = {
   currency: "USD",
-  originalAccountSize: 25000,
-  startingBalance: 24760.4,
+  originalAccountSize: 0,
+  startingBalance: 0,
   maxRiskPercent: 1,
   targetRr: 3,
   rrTolerance: 0.05,
   cycleLength: 6,
   noTradeNotes: "",
   newsRuleMode: "warn",
+  configured: false,
 };
 
 export interface TradeDraft {
@@ -747,7 +758,7 @@ export const useJournal = create<JournalState>()(
       name: "six-journal-v1",
       storage: createJSONStorage(() => safeStorage),
       skipHydration: true,
-      version: 1,
+      version: 2,
       partialize: (state) => ({
         settings: state.settings,
         trades: state.trades,

@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ChartRouteImport } from './routes/chart'
 import { Route as CycleRouteImport } from './routes/cycle'
 import { Route as JournalRouteImport } from './routes/journal'
 import { Route as SettingsRouteImport } from './routes/settings'
@@ -21,6 +22,11 @@ import { Route as SetupsTradeIdEditRouteImport } from './routes/setups/$tradeId.
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChartRoute = ChartRouteImport.update({
+  id: '/chart',
+  path: '/chart',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CycleRoute = CycleRouteImport.update({
@@ -61,6 +67,7 @@ const SetupsTradeIdEditRoute = SetupsTradeIdEditRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/chart': typeof ChartRoute
   '/cycle': typeof CycleRoute
   '/journal': typeof JournalRoute
   '/settings': typeof SettingsRoute
@@ -71,6 +78,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/chart': typeof ChartRoute
   '/cycle': typeof CycleRoute
   '/journal': typeof JournalRoute
   '/settings': typeof SettingsRoute
@@ -82,6 +90,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/chart': typeof ChartRoute
   '/cycle': typeof CycleRoute
   '/journal': typeof JournalRoute
   '/settings': typeof SettingsRoute
@@ -94,6 +103,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/chart'
     | '/cycle'
     | '/journal'
     | '/settings'
@@ -104,6 +114,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/chart'
     | '/cycle'
     | '/journal'
     | '/settings'
@@ -114,6 +125,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/chart'
     | '/cycle'
     | '/journal'
     | '/settings'
@@ -125,6 +137,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ChartRoute: typeof ChartRoute
   CycleRoute: typeof CycleRoute
   JournalRoute: typeof JournalRoute
   SettingsRoute: typeof SettingsRoute
@@ -140,6 +153,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chart': {
+      id: '/chart'
+      path: '/chart'
+      fullPath: '/chart'
+      preLoaderRoute: typeof ChartRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cycle': {
@@ -208,6 +228,7 @@ const SetupsTradeIdRouteWithChildren = SetupsTradeIdRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ChartRoute: ChartRoute,
   CycleRoute: CycleRoute,
   JournalRoute: JournalRoute,
   SettingsRoute: SettingsRoute,
